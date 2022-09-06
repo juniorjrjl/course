@@ -9,6 +9,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -25,7 +28,22 @@ public class ModuleServiceImpl implements ModuleService {
             if (CollectionUtils.isNotEmpty(lessons)){
                 lessonRepository.deleteAll(lessons);
             }
-            moduleRepository.delete(model);
         }
+        moduleRepository.delete(model);
+    }
+
+    @Override
+    public ModuleModel save(final ModuleModel model) {
+        return moduleRepository.save(model);
+    }
+
+    @Override
+    public Optional<ModuleModel> findModuleIntoCourse(final UUID courseId, final UUID id) {
+        return moduleRepository.findModulesIntoCourse(courseId, id);
+    }
+
+    @Override
+    public List<ModuleModel> findAllByCourse(final UUID courseId) {
+        return moduleRepository.findAllModulesIntoCourse(courseId);
     }
 }
