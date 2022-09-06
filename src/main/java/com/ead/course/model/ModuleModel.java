@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,7 +24,9 @@ import java.util.UUID;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.AUTO;
+import static org.hibernate.annotations.FetchMode.SUBSELECT;
 
 @Getter
 @Setter
@@ -51,12 +54,13 @@ public class ModuleModel implements Serializable {
 
     @JsonProperty(access = WRITE_ONLY)
     @ToString.Exclude
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = LAZY)
     private CourseModel course;
 
     @JsonProperty(access = WRITE_ONLY)
     @ToString.Exclude
     @OneToMany(mappedBy = "module")
+    @Fetch(SUBSELECT)
     private Set<LessonModel> lessons;
 
     @Override

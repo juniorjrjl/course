@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.AUTO;
 
@@ -70,7 +71,7 @@ public class CourseModel implements Serializable {
 
     @JsonProperty(access = WRITE_ONLY)
     @ToString.Exclude
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = ALL, orphanRemoval = true)
     private Set<ModuleModel> modules;
 
     @Override
