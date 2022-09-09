@@ -1,8 +1,10 @@
 package com.ead.course.controller;
 
+import com.ead.course.dto.LessonDTO;
 import com.ead.course.dto.ModuleDTO;
+import com.ead.course.model.LessonModel;
 import com.ead.course.model.ModuleModel;
-import com.ead.course.service.CourseService;
+import com.ead.course.service.LessonService;
 import com.ead.course.service.ModuleService;
 import com.ead.course.specication.SpecificationTemplate;
 import lombok.AllArgsConstructor;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -31,59 +34,60 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("courses/{courseId}/modules")
+@RequestMapping("modules/{moduleId}/lessons")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
-public class ModuleController {
+public class LessonController {
 
+    public final LessonService lessonService;
     private final ModuleService moduleService;
-    private final CourseService courseService;
 
     @PostMapping
-    public ResponseEntity<Object> save(@PathVariable final UUID courseId, @RequestBody @Valid final ModuleDTO request){
-        var courseOptional = courseService.findById(courseId);
-        if (courseOptional.isEmpty()) {
-            return ResponseEntity.status(NOT_FOUND).body("Course not found");
+    public ResponseEntity<Object> save(@PathVariable final UUID moduleId, @RequestBody @Valid final LessonDTO request){
+        var moduleOptional = moduleService.findById(moduleId);
+        if (moduleOptional.isEmpty()) {
+            return ResponseEntity.status(NOT_FOUND).body("Module not found");
         }
-        var model = new ModuleModel();
+        var model = new LessonModel();
         BeanUtils.copyProperties(request, model);
         model.setCreationDate(OffsetDateTime.now());
-        model.setCourse(courseOptional.get());
-        return ResponseEntity.status(CREATED).body(moduleService.save(model));
+        model.setModule(moduleOptional.get());
+        return ResponseEntity.status(CREATED).body(lessonService.save(model));
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Object> update(@PathVariable final UUID courseId, @PathVariable final UUID id,
-                                       @RequestBody @Valid final ModuleDTO request){
-        var modelOptional = moduleService.findModuleIntoCourse(courseId, id);
+    public ResponseEntity<Object> update(@PathVariable final UUID moduleId, @PathVariable final UUID id,
+                                         @RequestBody @Valid final LessonDTO request){
+        var modelOptional = lessonService.findLessonIntoModule(moduleId, id);
         if (modelOptional.isEmpty()) {
-            return ResponseEntity.status(NOT_FOUND).body("Module not found for this course");
+            return ResponseEntity.status(NOT_FOUND).body("Lesson not found for this module");
         }
         var model = modelOptional.get();
         model.setTitle(request.getTitle());
         model.setDescription(request.getDescription());
-        return ResponseEntity.status(OK).body(moduleService.save(model));
+        model.setVideoUrl(request.getVideoUrl());
+        return ResponseEntity.status(OK).body(lessonService.save(model));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Object> delete(@PathVariable final UUID courseId, @PathVariable final UUID id) {
-        var modelOptional = moduleService.findModuleIntoCourse(courseId, id);
+    public ResponseEntity<Object> delete(@PathVariable final UUID moduleId, @PathVariable final UUID id) {
+        var modelOptional = lessonService.findLessonIntoModule(moduleId, id);
         if (modelOptional.isEmpty()) {
-            return ResponseEntity.status(NOT_FOUND).body("Module not found for this course");
+            return ResponseEntity.status(NOT_FOUND).body("Lesson not found for this module");
         }
-        moduleService.delete(modelOptional.get());
+        lessonService.delete(modelOptional.get());
         return ResponseEntity.status(OK).build();
     }
 
     @GetMapping
-    public ResponseEntity<Page<ModuleModel>> findAll(@PathVariable final UUID courseId, final SpecificationTemplate.ModuleSpec spec,
+    public ResponseEntity<Page<LessonModel>> findAll(@PathVariable final UUID moduleId, final SpecificationTemplate.LessonSpec spec,
                                                      @PageableDefault(sort = "id", direction = Sort.Direction.ASC) final Pageable pageable){
-        return ResponseEntity.status(OK).body(moduleService.findAllByCourse(SpecificationTemplate.moduleCourseId(courseId).and(spec), pageable));
+        return ResponseEntity.status(OK).body(lessonService.findAllByLesson(SpecificationTemplate.lessonModuleId(moduleId).and(spec), pageable));
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Object> findModuleIntoCourse(@PathVariable final UUID courseId, @PathVariable final UUID id){
-        var modelOptional = moduleService.findModuleIntoCourse(courseId, id);
+    public ResponseEntity<Object> findModuleIntoCourse(@PathVariable final UUID moduleId, @PathVariable final UUID id){
+        var modelOptional = lessonService.findLessonIntoModule(moduleId, id);
         if (modelOptional.isEmpty()) {
             return ResponseEntity.status(NOT_FOUND).body("Module not found for this course");
         }

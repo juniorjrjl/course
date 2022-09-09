@@ -3,8 +3,13 @@ package com.ead.course.controller;
 import com.ead.course.dto.CourseDTO;
 import com.ead.course.model.CourseModel;
 import com.ead.course.service.CourseService;
+import com.ead.course.specication.SpecificationTemplate;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -69,8 +73,9 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CourseModel>> findAll(){
-        return ResponseEntity.status(OK).body(courseService.findAll());
+    public ResponseEntity<Page<CourseModel>> findAll(final SpecificationTemplate.CourseSpec spec,
+                                                     @PageableDefault(sort = "id", direction = Sort.Direction.ASC) final Pageable pageable){
+        return ResponseEntity.status(OK).body(courseService.findAll(spec, pageable));
     }
 
     @GetMapping("{id}")
