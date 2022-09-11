@@ -7,7 +7,7 @@ import com.ead.course.repository.LessonRepository;
 import com.ead.course.repository.ModuleRepository;
 import com.ead.course.service.CourseService;
 import lombok.AllArgsConstructor;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
