@@ -7,7 +7,7 @@ services:
     command: bash start-dev.sh
     ports:
       - "8082:8082"
-      - "5005:5005"
+      - "5006:5005"
     environment:
       GRADLE_USER_HOME: /box
       SPRING_PROFILES_ACTIVE: dev
@@ -25,7 +25,7 @@ services:
       POSTGRES_PASSWORD: ead-course
       POSTGRES_DB: ead-course
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - ead-microservices-net
   box:

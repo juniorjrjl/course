@@ -78,6 +78,11 @@ public class CourseModel implements Serializable {
     @OneToMany(mappedBy = "course", cascade = ALL, orphanRemoval = true)
     private Set<ModuleModel> modules;
 
+    @ToString.Exclude
+    @JsonProperty(access = WRITE_ONLY)
+    @OneToMany(mappedBy = "course")
+    private Set<CourseUserModel> coursesUsers;
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;

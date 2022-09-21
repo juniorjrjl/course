@@ -21,4 +21,4 @@ spring:
       enabled: Always
 
   liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.sql
+    change-log: classpath:db/changelog/db.changelog-master.yml
