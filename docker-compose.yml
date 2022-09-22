@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  app:
+  appcourse:
     build:
       context: .
     command: bash start-dev.sh
@@ -13,12 +13,12 @@ services:
       SPRING_PROFILES_ACTIVE: dev
     volumes:
       - .:/course
-      - box:/box
+      - boxcourse:/box
     depends_on:
-      - db
+      - dbcourse
     networks:
       - ead-microservices-net
-  db:
+  dbcourse:
     image: postgres:14.5
     environment:
       POSTGRES_USER: ead-course
@@ -28,7 +28,7 @@ services:
       - "5433:5432"
     networks:
       - ead-microservices-net
-  box:
+  boxcourse:
     image: busybox
     volumes:
       - /box
@@ -36,7 +36,8 @@ services:
       - ead-microservices-net
 networks:
   ead-microservices-net:
-    name: custom-net
+    name: ead-microservices-net
+    external: true
 volumes:
-  db:
-  box:
+  dbcourse:
+  boxcourse:

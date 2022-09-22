@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://db/ead-course
+    url: jdbc:postgresql://dbcourse/ead-course
     username: ead-course
     password: ead-course
 
