@@ -2,6 +2,7 @@ package com.ead.course.specication;
 
 import com.ead.course.model.CourseModel;
 import com.ead.course.model.CourseModel_;
+import com.ead.course.model.CourseUserModel_;
 import com.ead.course.model.LessonModel;
 import com.ead.course.model.LessonModel_;
 import com.ead.course.model.ModuleModel;
@@ -44,6 +45,14 @@ public class SpecificationTemplate {
             var module = query.from(ModuleModel.class);
             var moduleLessons = module.get(ModuleModel_.lessons);
             return criteriaBuilder.and(criteriaBuilder.equal(module.get(ModuleModel_.id), moduleId), criteriaBuilder.isMember(root, moduleLessons));
+        };
+    }
+
+    public static Specification<CourseModel> courseUserId(final UUID userId){
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
+            var  courseProd = root.join(CourseModel_.coursesUsers);
+            return criteriaBuilder.equal(courseProd.get(CourseUserModel_.userId), userId);
         };
     }
 

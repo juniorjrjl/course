@@ -20,12 +20,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
+import static com.ead.course.specication.SpecificationTemplate.courseUserId;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
@@ -87,9 +90,10 @@ public class CourseController {
 
     @GetMapping
     public ResponseEntity<Page<CourseModel>> findAll(final SpecificationTemplate.CourseSpec spec,
-                                                     @PageableDefault(sort = "id", direction = Sort.Direction.ASC) final Pageable pageable){
+                                                     @PageableDefault(sort = "id", direction = Sort.Direction.ASC) final Pageable pageable,
+                                                     @RequestParam(required = false) final UUID userId){
         log.debug("[GET] [findAll] find courses with spec {} and page {}", spec, pageable);
-        var page = courseService.findAll(spec, pageable);
+        var page = courseService.findAll(Objects.nonNull(userId) ? courseUserId(userId).and(spec) : spec, pageable);
         log.debug("[GET] [findAll] courses founded {}", page);
         log.info("[GET] [findAll] courses founded {}", page);
         return ResponseEntity.status(OK).body(page);
