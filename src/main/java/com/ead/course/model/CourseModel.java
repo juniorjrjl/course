@@ -83,6 +83,10 @@ public class CourseModel implements Serializable {
     @OneToMany(mappedBy = "course")
     private Set<CourseUserModel> coursesUsers;
 
+    public CourseUserModel toCourseUserModel(final UUID userID){
+        return new CourseUserModel(null, this, userID);
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;

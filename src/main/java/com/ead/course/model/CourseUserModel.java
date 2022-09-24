@@ -1,6 +1,7 @@
 package com.ead.course.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +25,7 @@ import static javax.persistence.GenerationType.AUTO;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(NON_NULL)
 @Entity
 @Table(name = "TB_COURSES_USERS")

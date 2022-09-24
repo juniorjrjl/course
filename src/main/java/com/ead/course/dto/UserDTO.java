@@ -6,6 +6,8 @@ import lombok.Data;
 
 import java.util.UUID;
 
+import static com.ead.course.enumeration.UserStatus.BLOCKED;
+
 @Data
 public class UserDTO {
 
@@ -18,5 +20,9 @@ public class UserDTO {
     private String phoneNumber;
     private String cpf;
     private String imageUrl;
+
+    public boolean isBlocked(){
+        return userStatus.equals(BLOCKED);
+    }
 
 }

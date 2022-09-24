@@ -22,3 +22,15 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yml
+
+logging:
+  level:
+    com.ead:  TRACE
+    root: INFO
+    org.springframework.web:  DEBUG
+    org.hibernate:  INFO
+
+ead:
+  api:
+    url:
+      auth-user: 'http://appauth:8087'
