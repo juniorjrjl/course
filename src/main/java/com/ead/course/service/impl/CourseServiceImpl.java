@@ -1,8 +1,10 @@
 package com.ead.course.service.impl;
 
 import com.ead.course.model.CourseModel;
+import com.ead.course.model.CourseUserModel;
 import com.ead.course.model.ModuleModel;
 import com.ead.course.repository.CourseRepository;
+import com.ead.course.repository.CourseUserRepository;
 import com.ead.course.repository.LessonRepository;
 import com.ead.course.repository.ModuleRepository;
 import com.ead.course.service.CourseService;
@@ -14,6 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +27,7 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final ModuleRepository moduleRepository;
     private final LessonRepository lessonRepository;
+    private final CourseUserRepository courseUserRepository;
 
     @Transactional
     @Override
@@ -37,6 +41,10 @@ public class CourseServiceImpl implements CourseService {
                 }
             }
             moduleRepository.deleteAll(modules);
+        }
+        var courseUserModels = courseUserRepository.findAllCourseUserIntoCourse(model.getId());
+        if (CollectionUtils.isNotEmpty(courseUserModels)){
+            courseUserRepository.deleteAll(courseUserModels);
         }
         courseRepository.delete(model);
     }

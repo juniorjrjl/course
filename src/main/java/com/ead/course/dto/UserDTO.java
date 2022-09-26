@@ -7,6 +7,7 @@ import lombok.Data;
 import java.util.UUID;
 
 import static com.ead.course.enumeration.UserStatus.BLOCKED;
+import static com.ead.course.enumeration.UserType.STUDENT;
 
 @Data
 public class UserDTO {
@@ -23,6 +24,10 @@ public class UserDTO {
 
     public boolean isBlocked(){
         return userStatus.equals(BLOCKED);
+    }
+
+    public boolean canNotCreateCourse(){
+        return userType.equals(STUDENT);
     }
 
 }

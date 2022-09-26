@@ -4,6 +4,7 @@ import com.ead.course.dto.CourseDTO;
 import com.ead.course.model.CourseModel;
 import com.ead.course.service.CourseService;
 import com.ead.course.specication.SpecificationTemplate;
+import com.ead.course.validation.CourseValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static com.ead.course.specication.SpecificationTemplate.courseUserId;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
@@ -41,10 +44,15 @@ import static org.springframework.http.HttpStatus.OK;
 public class CourseController {
 
     private final CourseService courseService;
+    private final CourseValidator courseValidator;
 
     @PostMapping
-    public ResponseEntity<Object> save(@RequestBody @Valid final CourseDTO request){
+    public ResponseEntity<Object> save(@RequestBody final CourseDTO request, final Errors errors){
         log.debug("[POST] [save] courseDto received {}", request);
+        courseValidator.validate(request, errors);
+        if (errors.hasErrors()){
+            return ResponseEntity.status(BAD_REQUEST).body(errors.getAllErrors());
+        }
         var model = new CourseModel();
         BeanUtils.copyProperties(request, model);
         model.setCreationDate(OffsetDateTime.now());
