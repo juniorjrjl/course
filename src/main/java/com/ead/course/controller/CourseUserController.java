@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("courses/{courseId}/users")
+@RequestMapping
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
 @Log4j2
@@ -41,13 +42,13 @@ public class CourseUserController {
 
     private final CourseUserService courseUserService;
 
-    @GetMapping
+    @GetMapping("courses/{courseId}/users")
     public ResponseEntity<Page<UserDTO>> getAllUsersByCourse(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) final Pageable pageable,
                                                              @PathVariable final UUID courseId){
         return ResponseEntity.status(OK).body(authUserClient.getAllUsersByCourse(pageable, courseId));
     }
 
-    @PostMapping("subscription")
+    @PostMapping("courses/{courseId}/users/subscription")
     public ResponseEntity<Object> subscribeUser(@PathVariable final UUID courseId,
                                                 @RequestBody @Valid final SubscriptionDTO request){
         ResponseEntity<UserDTO> responseUser;
@@ -72,5 +73,15 @@ public class CourseUserController {
         var courseUser = courseUserService.saveAndSendSubscriptionUserInCourse(model.toCourseUserModel(request.getUserId()));
         return ResponseEntity.status(CREATED).body(courseUser);
     }
+
+    @DeleteMapping("courses/users/{userId}")
+    public ResponseEntity<Object> deleteCourseUserByUser(@PathVariable final UUID userId){
+        if (!courseUserService.existsByUserId(userId)){
+            return ResponseEntity.status(NOT_FOUND).body("CourseUser not foud");
+        }
+        courseUserService.deleteCourseUserByUser(userId);
+        return ResponseEntity.status(OK).body("CourseUser deleted successfully.");
+    }
+
 
 }

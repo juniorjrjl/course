@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
@@ -60,4 +61,10 @@ public class AuthUserClient {
         var request = new UserCourseDTO(courseId);
         restTemplate.postForObject(url, request, String.class);
     }
+
+    public void deleteCourseInAuthUser(final UUID courseId) {
+        var url = requestUrlAuthUser + "/users/courses/" + courseId;
+        restTemplate.exchange(url, DELETE, null, String.class);
+    }
+
 }
