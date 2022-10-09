@@ -2,11 +2,12 @@ package com.ead.course.specication;
 
 import com.ead.course.model.CourseModel;
 import com.ead.course.model.CourseModel_;
-import com.ead.course.model.CourseUserModel_;
 import com.ead.course.model.LessonModel;
 import com.ead.course.model.LessonModel_;
 import com.ead.course.model.ModuleModel;
 import com.ead.course.model.ModuleModel_;
+import com.ead.course.model.UserModel;
+import com.ead.course.model.UserModel_;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.Like;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
@@ -23,6 +24,14 @@ public class SpecificationTemplate {
             @Spec(path = CourseModel_.NAME, spec = Like.class)
     })
     public interface CourseSpec extends Specification<CourseModel> {}
+
+    @And({
+            @Spec(path = UserModel_.EMAIL, spec = Like.class),
+            @Spec(path = UserModel_.FULL_NAME, spec = Like.class),
+            @Spec(path = UserModel_.USER_STATUS, spec = Equal.class),
+            @Spec(path = UserModel_.USER_TYPE, spec = Equal.class)
+    })
+    public interface UserSpec extends Specification<UserModel> {}
 
     @Spec(path = ModuleModel_.TITLE, spec = Like.class)
     public interface ModuleSpec extends Specification<ModuleModel> {}
@@ -48,11 +57,21 @@ public class SpecificationTemplate {
         };
     }
 
+    public static Specification<UserModel> userCourseId(final UUID courseId){
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
+            var course = query.from(CourseModel.class);
+            var coursesUsers = course.get(CourseModel_.users);
+            return criteriaBuilder.and(criteriaBuilder.equal(course.get(CourseModel_.id), courseId), criteriaBuilder.isMember(root, coursesUsers));
+        };
+    }
+
     public static Specification<CourseModel> courseUserId(final UUID userId){
         return (root, query, criteriaBuilder) -> {
             query.distinct(true);
-            var  courseProd = root.join(CourseModel_.coursesUsers);
-            return criteriaBuilder.equal(courseProd.get(CourseUserModel_.userId), userId);
+            var user = query.from(UserModel.class);
+            var usersCourses = user.get(UserModel_.courses);
+            return criteriaBuilder.and(criteriaBuilder.equal(user.get(UserModel_.id), userId), criteriaBuilder.isMember(root, usersCourses));
         };
     }
 

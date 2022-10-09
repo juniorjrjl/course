@@ -101,7 +101,7 @@ public class CourseController {
                                                      @PageableDefault(sort = "id", direction = Sort.Direction.ASC) final Pageable pageable,
                                                      @RequestParam(required = false) final UUID userId){
         log.debug("[GET] [findAll] find courses with spec {} and page {}", spec, pageable);
-        var page = courseService.findAll(Objects.nonNull(userId) ? courseUserId(userId).and(spec) : spec, pageable);
+        var page = courseService.findAll(Objects.isNull(userId) ? spec : courseUserId(userId).and(spec), pageable);
         log.debug("[GET] [findAll] courses founded {}", page);
         log.info("[GET] [findAll] courses founded {}", page);
         return ResponseEntity.status(OK).body(page);

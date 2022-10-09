@@ -11,3 +11,9 @@ databaseChangeLog:
       file: /db/changelog/db.changelog-202209051838.sql
   - include:
       file: /db/changelog/db.changelog-202209211346.sql
+  - include:
+      file: /db/changelog/db.changelog-202210071204.sql
+  - include:
+      file: /db/changelog/db.changelog-202210071550.sql
+  - include:
+      file: /db/changelog/db.changelog-202210071741.sql

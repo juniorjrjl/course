@@ -15,6 +15,9 @@ import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
@@ -28,6 +31,7 @@ import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
 import static com.fasterxml.jackson.databind.util.StdDateFormat.DATE_FORMAT_STR_ISO8601;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.AUTO;
 
 @Getter
@@ -78,14 +82,13 @@ public class CourseModel implements Serializable {
     @OneToMany(mappedBy = "course", cascade = ALL, orphanRemoval = true)
     private Set<ModuleModel> modules;
 
-    @ToString.Exclude
     @JsonProperty(access = WRITE_ONLY)
-    @OneToMany(mappedBy = "course")
-    private Set<CourseUserModel> coursesUsers;
+    @ManyToMany(fetch = LAZY)
+    @JoinTable(name = "TB_COURSES_USERS",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<UserModel> users;
 
-    public CourseUserModel toCourseUserModel(final UUID userID){
-        return new CourseUserModel(null, this, userID);
-    }
 
     @Override
     public boolean equals(final Object o) {
