@@ -10,7 +10,7 @@ services:
       - "5006:5005"
     environment:
       GRADLE_USER_HOME: /box
-      SPRING_PROFILES_ACTIVE: dev
+      #SPRING_PROFILES_ACTIVE: dev
     volumes:
       - .:/course
       - boxcourse:/box
