@@ -23,7 +23,7 @@ public class UserConsumer {
     @RabbitListener(
             bindings = @QueueBinding(
                     value = @Queue(value = "${ead.broker.queue.name}", durable = "true"),
-                    exchange = @Exchange(value = "${ead.broker.exchange.userEventExchange}", type = FANOUT, ignoreDeclarationExceptions = "true"))
+                    exchange = @Exchange(value = "${ead.broker.exchange.user-event-exchange}", type = FANOUT, ignoreDeclarationExceptions = "true"))
     )
     public void listenUserEvent(@Payload final UserEventDTO dto){
         var model = dto.toModel();

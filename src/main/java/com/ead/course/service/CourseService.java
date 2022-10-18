@@ -1,6 +1,7 @@
 package com.ead.course.service;
 
 import com.ead.course.model.CourseModel;
+import com.ead.course.model.UserModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,6 +21,6 @@ public interface CourseService {
 
     boolean existsByCourseAndUser(final UUID courseId, final UUID userId);
 
-    void saveSubscriptionUserInCourse(final UUID courseId, final UUID userId);
+    void saveSubscriptionUserInCourse(final CourseModel courseModel, final UserModel userModel);
 
 }
