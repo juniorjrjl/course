@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,6 +47,7 @@ public class CourseController {
     private final CourseService courseService;
     private final CourseValidator courseValidator;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PostMapping
     public ResponseEntity<Object> save(@RequestBody final CourseDTO request, final Errors errors){
         log.debug("[POST] [save] courseDto received {}", request);
@@ -63,6 +65,7 @@ public class CourseController {
         return ResponseEntity.status(CREATED).body(model);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @DeleteMapping("{id}")
     public ResponseEntity<Object> delete(@PathVariable final UUID id) {
         log.debug("[DELETE] [delete] id received {}", id);
@@ -76,6 +79,7 @@ public class CourseController {
         return ResponseEntity.status(OK).build();
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PutMapping("{id}")
     public ResponseEntity<Object> update(@PathVariable final UUID id, @RequestBody @Valid final CourseDTO request) {
         log.debug("[PUT] [update] courseDto received {}", request);
@@ -96,6 +100,7 @@ public class CourseController {
         return ResponseEntity.status(OK).body(model);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping
     public ResponseEntity<Page<CourseModel>> findAll(final SpecificationTemplate.CourseSpec spec,
                                                      @PageableDefault(sort = "id", direction = Sort.Direction.ASC) final Pageable pageable,
@@ -107,6 +112,7 @@ public class CourseController {
         return ResponseEntity.status(OK).body(page);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("{id}")
     public ResponseEntity<Object> findById(@PathVariable final UUID id) {
         log.debug("[GET] [getOne] id received {}", id);

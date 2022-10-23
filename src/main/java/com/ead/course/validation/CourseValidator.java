@@ -1,8 +1,11 @@
 package com.ead.course.validation;
 
+import com.ead.course.config.security.AuthenticationCurrentUserService;
 import com.ead.course.dto.CourseDTO;
 import com.ead.course.service.UserService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -14,10 +17,14 @@ public class CourseValidator implements Validator {
 
     private final Validator validator;
     private final UserService userService;
+    private final AuthenticationCurrentUserService authenticationCurrentUserService;
 
-    public CourseValidator(@Qualifier("defaultValidator") final Validator validator, final UserService userService) {
+    public CourseValidator(@Qualifier("defaultValidator") final Validator validator,
+                           final UserService userService,
+                           final AuthenticationCurrentUserService authenticationCurrentUserService) {
         this.validator = validator;
         this.userService = userService;
+        this.authenticationCurrentUserService = authenticationCurrentUserService;
     }
 
     @Override
@@ -35,7 +42,11 @@ public class CourseValidator implements Validator {
     }
 
     private void validateUserInstructor(final UUID userInstructor, final Errors errors){
+        var currentUserId = authenticationCurrentUserService.getCurrentUser().id();
         var modelOptional = userService.findById(userInstructor);
+        if (ObjectUtils.notEqual(currentUserId, userInstructor)){
+            throw new AccessDeniedException("Forbidden");
+        }
         modelOptional.ifPresentOrElse(model -> {
             if (model.isStudent()){
                 errors.rejectValue("userInstructor", "UserInstructorError", "User must be INSTRUCTOR or ADMIN");

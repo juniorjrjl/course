@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +42,7 @@ public class LessonController {
     public final LessonService lessonService;
     private final ModuleService moduleService;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PostMapping
     public ResponseEntity<Object> save(@PathVariable final UUID moduleId, @RequestBody @Valid final LessonDTO request){
         log.debug("[POST] [save] lessonDto {} and moduleId {} received", moduleId, request);
@@ -58,6 +60,7 @@ public class LessonController {
         return ResponseEntity.status(CREATED).body(model);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PutMapping("{id}")
     public ResponseEntity<Object> update(@PathVariable final UUID moduleId, @PathVariable final UUID id,
                                          @RequestBody @Valid final LessonDTO request){
@@ -76,6 +79,7 @@ public class LessonController {
         return ResponseEntity.status(OK).body(model);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @DeleteMapping("{id}")
     public ResponseEntity<Object> delete(@PathVariable final UUID moduleId, @PathVariable final UUID id) {
         log.debug("[DELETE] [delete] moduleId {} and id {} received", moduleId, id);
@@ -89,6 +93,7 @@ public class LessonController {
         return ResponseEntity.status(OK).build();
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping
     public ResponseEntity<Page<LessonModel>> findAll(@PathVariable final UUID moduleId, final SpecificationTemplate.LessonSpec spec,
                                                      @PageableDefault(sort = "id", direction = Sort.Direction.ASC) final Pageable pageable){
@@ -99,6 +104,7 @@ public class LessonController {
         return ResponseEntity.status(OK).body(page);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("{id}")
     public ResponseEntity<Object> findModuleIntoCourse(@PathVariable final UUID moduleId, @PathVariable final UUID id){
         log.debug("[GET] [getOne] moduleId {} and id {} received", moduleId, id);
