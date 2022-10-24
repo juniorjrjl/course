@@ -9,3 +9,8 @@ spring:
         service-id: ead-config-server
       username: configserver
       password: ead123cs
+  devtools:
+    remote:
+      secret: 123
+    restart:
+      trigger-file: trigger.txt
