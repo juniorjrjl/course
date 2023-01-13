@@ -2,18 +2,14 @@ package com.ead.course.service.impl;
 
 import com.ead.course.exception.DomainNotFoundException;
 import com.ead.course.model.ModuleModel;
-import com.ead.course.repository.LessonRepository;
 import com.ead.course.repository.ModuleRepository;
 import com.ead.course.service.ModuleQueryService;
 import lombok.AllArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

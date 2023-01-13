@@ -25,25 +25,12 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final CourseQueryService courseQueryService;
     private final UserQueryService userQueryService;
-    //private final ModuleRepository moduleRepository;
-    //private final LessonRepository lessonRepository;
     private final NotificationCommandPublisher notificationCommandPublisher;
 
     @Transactional
     @Override
     public void delete(final UUID id) {
         var model = courseQueryService.findById(id);
-        /*var modules = moduleRepository.findAllModulesIntoCourse(model.getId());
-        if (CollectionUtils.isNotEmpty(modules)){
-            for(ModuleModel module: modules){
-                var lessons = lessonRepository.findAllLessonsIntoModule(module.getId());
-                if (CollectionUtils.isNotEmpty(lessons)){
-                    lessonRepository.deleteAll(lessons);
-                }
-            }
-            moduleRepository.deleteAll(modules);
-        }
-        courseRepository.deleteCourseUserByCourse(model.getId());*/
         courseRepository.delete(model);
     }
 
