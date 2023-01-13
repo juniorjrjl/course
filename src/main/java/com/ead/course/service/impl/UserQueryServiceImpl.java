@@ -1,9 +1,10 @@
 package com.ead.course.service.impl;
 
+import com.ead.course.exception.DomainNotFoundException;
 import com.ead.course.model.UserModel;
 import com.ead.course.repository.CourseRepository;
 import com.ead.course.repository.UserRepository;
-import com.ead.course.service.UserService;
+import com.ead.course.service.UserQueryService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,22 +17,17 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserQueryServiceImpl implements UserQueryService {
 
     private final UserRepository userRepository;
-    private final CourseRepository courseRepository;
-
 
     @Override
-    public UserModel save(final UserModel model) {
-        return userRepository.save(model);
+    public Page<UserModel> findAll(final Specification<UserModel> spec, final Pageable pageable) {
+        return userRepository.findAll(spec, pageable);
     }
 
-    @Transactional
     @Override
-    public void delete(final UUID id) {
-        courseRepository.deleteCourseUserByUser(id);
-        userRepository.deleteById(id);
+    public UserModel findById(final UUID id) {
+        return userRepository.findById(id).orElseThrow(() -> new DomainNotFoundException("User not found"));
     }
-
 }

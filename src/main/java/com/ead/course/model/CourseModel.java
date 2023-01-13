@@ -19,6 +19,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -82,6 +84,7 @@ public class CourseModel implements Serializable {
     @OneToMany(mappedBy = "course", cascade = ALL, orphanRemoval = true)
     private Set<ModuleModel> modules;
 
+    @ToString.Exclude
     @JsonProperty(access = WRITE_ONLY)
     @ManyToMany(fetch = LAZY)
     @JoinTable(name = "TB_COURSES_USERS",
@@ -89,6 +92,17 @@ public class CourseModel implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<UserModel> users;
 
+
+    @PrePersist
+    public void beforeInsert(){
+        this.creationDate = OffsetDateTime.now();
+        this.lastUpdateDate = OffsetDateTime.now();
+    }
+
+    @PreUpdate
+    public void beforeUpdate(){
+        this.lastUpdateDate = OffsetDateTime.now();
+    }
 
     @Override
     public boolean equals(final Object o) {

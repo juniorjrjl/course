@@ -8,11 +8,9 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserService {
+public interface UserQueryService {
 
+    Page<UserModel> findAll(final Specification<UserModel> spec, final Pageable pageable);
 
-    UserModel save(final UserModel model);
-
-    void delete(final UUID id);
-
+    UserModel findById(final UUID id);
 }

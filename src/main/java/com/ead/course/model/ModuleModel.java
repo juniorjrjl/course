@@ -15,8 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
-
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Objects;
@@ -26,6 +26,7 @@ import java.util.UUID;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
 import static com.fasterxml.jackson.databind.util.StdDateFormat.DATE_FORMAT_STR_ISO8601;
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.AUTO;
 import static org.hibernate.annotations.FetchMode.SUBSELECT;
@@ -62,9 +63,14 @@ public class ModuleModel implements Serializable {
 
     @JsonProperty(access = WRITE_ONLY)
     @ToString.Exclude
-    @OneToMany(mappedBy = "module")
+    @OneToMany(mappedBy = "module", cascade = ALL, orphanRemoval = true)
     @Fetch(SUBSELECT)
     private Set<LessonModel> lessons;
+
+    @PrePersist
+    public void beforeInsert(){
+        this.creationDate = OffsetDateTime.now();
+    }
 
     @Override
     public boolean equals(final Object o) {

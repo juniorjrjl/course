@@ -1,24 +1,20 @@
 package com.ead.course.service.impl;
 
 import com.ead.course.dto.NotificationCommandDTO;
+import com.ead.course.exception.UserBlockedException;
+import com.ead.course.exception.UserSubscriptionAlreadyExistsException;
 import com.ead.course.model.CourseModel;
-import com.ead.course.model.ModuleModel;
-import com.ead.course.model.UserModel;
 import com.ead.course.publisher.NotificationCommandPublisher;
 import com.ead.course.repository.CourseRepository;
-import com.ead.course.repository.LessonRepository;
-import com.ead.course.repository.ModuleRepository;
+import com.ead.course.service.CourseQueryService;
 import com.ead.course.service.CourseService;
+import com.ead.course.service.UserQueryService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,14 +23,17 @@ import java.util.UUID;
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
-    private final ModuleRepository moduleRepository;
-    private final LessonRepository lessonRepository;
+    private final CourseQueryService courseQueryService;
+    private final UserQueryService userQueryService;
+    //private final ModuleRepository moduleRepository;
+    //private final LessonRepository lessonRepository;
     private final NotificationCommandPublisher notificationCommandPublisher;
 
     @Transactional
     @Override
-    public void delete(final CourseModel model) {
-        var modules = moduleRepository.findAllModulesIntoCourse(model.getId());
+    public void delete(final UUID id) {
+        var model = courseQueryService.findById(id);
+        /*var modules = moduleRepository.findAllModulesIntoCourse(model.getId());
         if (CollectionUtils.isNotEmpty(modules)){
             for(ModuleModel module: modules){
                 var lessons = lessonRepository.findAllLessonsIntoModule(module.getId());
@@ -44,33 +43,41 @@ public class CourseServiceImpl implements CourseService {
             }
             moduleRepository.deleteAll(modules);
         }
-        courseRepository.deleteCourseUserByCourse(model.getId());
+        courseRepository.deleteCourseUserByCourse(model.getId());*/
         courseRepository.delete(model);
     }
 
     @Override
     public CourseModel save(final CourseModel model) {
+        var userModel = userQueryService.findById(model.getUserInstructor());
+        if (userModel.isStudent()){
+            throw new AccessDeniedException("User must be INSTRUCTOR or ADMIN");
+        }
         return courseRepository.save(model);
     }
 
     @Override
-    public Optional<CourseModel> findById(final UUID id) {
-        return courseRepository.findById(id);
-    }
-
-    @Override
-    public Page<CourseModel> findAll(final Specification<CourseModel> spec, final Pageable pageable) {
-        return courseRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public boolean existsByCourseAndUser(final UUID courseId, final UUID userId) {
-        return courseRepository.existsByCourseAndUser(courseId, userId);
+    public CourseModel update(final UUID id, final CourseModel model) {
+        var modelToUpdate = courseQueryService.findById(id);
+        modelToUpdate.setName(model.getName());
+        modelToUpdate.setDescription(model.getDescription());
+        modelToUpdate.setImageUrl(model.getImageUrl());
+        modelToUpdate.setCourseStatus(model.getCourseStatus());
+        modelToUpdate.setCourseLevel(model.getCourseLevel());
+        return save(modelToUpdate);
     }
 
     @Transactional
     @Override
-    public void saveSubscriptionUserInCourse(final CourseModel courseModel, final UserModel userModel) {
+    public void saveSubscriptionUserInCourse(final UUID id, final UUID userId) {
+        var courseModel = courseQueryService.findById(id);
+        if(courseQueryService.existsByCourseAndUser(id, userId)){
+            throw new UserSubscriptionAlreadyExistsException("Error: subscription already exists!");
+        }
+        var userModel = userQueryService.findById(userId);
+        if(userModel.isBlocked()){
+            throw new UserBlockedException("User is blocked");
+        }
         courseRepository.saveSubscriptionUserInCourse(courseModel.getId(), userModel.getId());
         try {
             var dto = NotificationCommandDTO.builder()

@@ -2,14 +2,12 @@ package com.ead.course.service.impl;
 
 import com.ead.course.model.LessonModel;
 import com.ead.course.repository.LessonRepository;
+import com.ead.course.service.LessonQueryService;
 import com.ead.course.service.LessonService;
+import com.ead.course.service.ModuleQueryService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -17,24 +15,29 @@ import java.util.UUID;
 public class LessonServiceImpl implements LessonService {
 
     private final LessonRepository lessonRepository;
+    private final LessonQueryService lessonQueryService;
+    private final ModuleQueryService moduleQueryService;
 
     @Override
     public LessonModel save(final LessonModel model) {
+        moduleQueryService.findById(model.getModule().getId());
         return lessonRepository.save(model);
     }
 
     @Override
-    public Optional<LessonModel> findLessonIntoModule(final UUID moduleId, final UUID id) {
-        return lessonRepository.findLessonIntoModule(moduleId, id);
+    public LessonModel update(final UUID id, final LessonModel model) {
+        var modelToUpdate = lessonQueryService.findById(id);
+        modelToUpdate.setTitle(model.getTitle());
+        modelToUpdate.setDescription(model.getDescription());
+        modelToUpdate.setVideoUrl(model.getVideoUrl());
+        modelToUpdate.setModule(model.getModule());
+        return save(modelToUpdate);
     }
 
     @Override
-    public void delete(final LessonModel model) {
+    public void delete(final UUID id, final UUID moduleId) {
+        var model = lessonQueryService.findLessonIntoModule(moduleId, id);
         lessonRepository.delete(model);
     }
 
-    @Override
-    public Page<LessonModel> findAllByLesson(final Specification<LessonModel> spec, final Pageable pageable) {
-        return lessonRepository.findAll(spec, pageable);
-    }
 }
