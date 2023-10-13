@@ -5,10 +5,10 @@ import com.ead.course.adapter.outbound.persistence.entity.LessonEntity;
 import com.ead.course.adapter.outbound.persistence.entity.LessonEntity_;
 import com.ead.course.adapter.outbound.persistence.entity.ModuleEntity;
 import com.ead.course.adapter.outbound.persistence.entity.ModuleEntity_;
+import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

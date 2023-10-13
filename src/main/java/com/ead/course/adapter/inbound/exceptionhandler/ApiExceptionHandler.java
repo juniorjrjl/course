@@ -1,11 +1,11 @@
 package com.ead.course.adapter.inbound.exceptionhandler;
 
+import com.ead.course.adapter.response.FieldErrorDetailsResponse;
+import com.ead.course.adapter.response.ProblemResponse;
 import com.ead.course.core.exception.CourseException;
 import com.ead.course.core.exception.DomainNotFoundException;
 import com.ead.course.core.exception.UserBlockedException;
 import com.ead.course.core.exception.UserSubscriptionAlreadyExistsException;
-import com.ead.course.adapter.response.FieldErrorDetailsResponse;
-import com.ead.course.adapter.response.ProblemResponse;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
@@ -17,11 +17,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
@@ -44,14 +44,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     private final MessageSource messageSource;
 
     @Override
-    protected ResponseEntity<Object> handleBindException(final BindException ex, final HttpHeaders headers,
-                                                         final HttpStatus status, final WebRequest request) {
-        return buildResponseBodyWithValidateErrors(ex.getBindingResult(), status, request, ex);
-    }
-
-    @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(final HttpMessageNotReadableException ex, final HttpHeaders headers,
-                                                                  final HttpStatus status, final WebRequest request) {
+                                                                  final HttpStatusCode status, final WebRequest request) {
         var rootCause = ExceptionUtils.getRootCause(ex);
         if (rootCause instanceof InvalidFormatException invalidFormatException){
             return handleInvalidFormatException(invalidFormatException, headers, status, request);
@@ -68,7 +62,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(final NoHandlerFoundException ex, final HttpHeaders headers,
-                                                                   final HttpStatus status, final WebRequest request) {
+                                                                   final HttpStatusCode status, final WebRequest request) {
         var detail = String.format("O recurso '%s', que você tentou acessar, é inexistente", ex.getRequestURL());
         var response = ProblemResponse.builder()
                 .status(status.value())
@@ -80,7 +74,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(final TypeMismatchException ex, final HttpHeaders headers,
-                                                        final HttpStatus status, final WebRequest request) {
+                                                        final HttpStatusCode status, final WebRequest request) {
         if (ex instanceof MethodArgumentTypeMismatchException methodArgumentTypeMismatchException) {
             return handleMethodArgumentTypeMismatch(methodArgumentTypeMismatchException,
                     headers, status, request);
@@ -90,7 +84,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     public ResponseEntity<Object> handleMethodArgumentTypeMismatch(final MethodArgumentTypeMismatchException ex, final HttpHeaders headers,
-                                                                   final HttpStatus status, final WebRequest request) {
+                                                                   final HttpStatusCode status, final WebRequest request) {
         var detail = String.format("O parâmetro de URL '%s' recebeu o valor '%s', que é de um tipo inválido. " +
                         "Corrija e informe um valor compatível com o tipo %s",
                 ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName());
@@ -103,7 +97,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> handlePropertyBindingException(final PropertyBindingException ex, final HttpHeaders headers,
-                                                                  final HttpStatus status, final WebRequest request){
+                                                                  final HttpStatusCode status, final WebRequest request){
         String detail = String.format("A propriedade '%s' é inválida para o objeto '%s'",
                 ex.getPropertyName(),
                 ex.getReferringClass().getSimpleName());
@@ -116,7 +110,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> handleInvalidFormatException(final InvalidFormatException ex, final HttpHeaders headers,
-                                                                final HttpStatus status, final WebRequest request) {
+                                                                final HttpStatusCode status, final WebRequest request) {
         String path = ex.getPath().stream().map(JsonMappingException.Reference::getFieldName).collect(Collectors.joining("."));
         String detail = String.format("A propriedade '%s' recebeu o valor '%s', que é de um tipo inválido. Corrija e informe um valor compatível com o tipo %s",
                 path, ex.getValue(), ex.getTargetType().getSimpleName());
@@ -206,19 +200,19 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(final HttpMediaTypeNotAcceptableException ex,
-                                                                      final HttpHeaders headers, final HttpStatus status,
+                                                                      final HttpHeaders headers, final HttpStatusCode status,
                                                                       final WebRequest request) {
         return ResponseEntity.status(status).headers(headers).build();
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex,
-                                                                  final HttpHeaders headers, final HttpStatus status,
+                                                                  final HttpHeaders headers, final HttpStatusCode status,
                                                                   final WebRequest request) {
         return buildResponseBodyWithValidateErrors(ex.getBindingResult(), status, request, ex);
     }
 
-    private ResponseEntity<Object> buildResponseBodyWithValidateErrors(final BindingResult bindingResult, final HttpStatus status,
+    private ResponseEntity<Object> buildResponseBodyWithValidateErrors(final BindingResult bindingResult, final HttpStatusCode status,
                                                                        final WebRequest request, final Exception ex){
         var detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
         var problemFields = bindingResult.getAllErrors().stream()

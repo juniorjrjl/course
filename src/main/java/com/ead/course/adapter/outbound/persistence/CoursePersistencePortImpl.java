@@ -8,12 +8,12 @@ import com.ead.course.core.domain.CourseDomain;
 import com.ead.course.core.domain.CourseFilterDomain;
 import com.ead.course.core.domain.PageInfo;
 import com.ead.course.core.port.persistence.CoursePersistencePort;
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;

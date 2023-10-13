@@ -1,8 +1,7 @@
 package com.ead.course.adapter.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public record ModuleDTO(
         @NotBlank

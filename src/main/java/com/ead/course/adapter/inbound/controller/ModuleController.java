@@ -8,6 +8,7 @@ import com.ead.course.adapter.outbound.persistence.entity.ModuleEntity;
 import com.ead.course.core.domain.PageInfo;
 import com.ead.course.core.port.service.ModuleServicePort;
 import com.ead.course.core.port.service.query.ModuleQueryServicePort;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.UUID;
 import java.util.stream.Collectors;
 

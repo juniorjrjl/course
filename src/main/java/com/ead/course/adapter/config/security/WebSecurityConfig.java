@@ -3,18 +3,21 @@ package com.ead.course.adapter.config.security;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static jakarta.servlet.DispatcherType.ERROR;
 import static com.ead.course.core.domain.enumeration.RoleType.ROLE_ADMIN;
 import static com.ead.course.core.domain.enumeration.RoleType.ROLE_INSTRUCTOR;
 import static com.ead.course.core.domain.enumeration.RoleType.ROLE_STUDENT;
@@ -24,10 +27,11 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @AllArgsConstructor
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class WebSecurityConfig {
 
     private final AuthenticationEntryPointImpl authenticationEntryPoint;
+    private final AccessDeniedHandlerImpl accessDeniedHandler;
     private final JwtProvider jwtProvider;
 
     @Bean
@@ -38,18 +42,22 @@ public class WebSecurityConfig {
     @Bean
     protected SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
-                .sessionManagement().sessionCreationPolicy(STATELESS)
-                .and()
-                .authorizeRequests()
-                .anyRequest().authenticated()
-                .and()
-                .csrf()
-                .disable();
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(ERROR).permitAll()
+                        .anyRequest().authenticated())
+                .csrf(AbstractHttpConfigurer::disable);
         http.addFilterBefore(authenticationJwtFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public DefaultMethodSecurityExpressionHandler expressionHandler(){
+        var expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy());
+        return expressionHandler;
     }
 
     @Bean

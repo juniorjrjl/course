@@ -9,12 +9,12 @@ import com.ead.course.core.domain.LessonDomain;
 import com.ead.course.core.domain.LessonFilterDomain;
 import com.ead.course.core.domain.PageInfo;
 import com.ead.course.core.port.persistence.LessonPersistencePort;
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

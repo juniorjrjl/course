@@ -3,10 +3,9 @@ package com.ead.course.adapter.dto;
 import com.ead.course.core.domain.enumeration.CourseLevel;
 import com.ead.course.core.domain.enumeration.CourseStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record CourseDTO(
